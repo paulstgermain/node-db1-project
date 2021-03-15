@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { getAll, getById, create, updateById, deleteById } = require('./accounts-model');
-const { checkAccountId, checkAccountPayload } = require('./accounts-middleware');
+const { checkAccountId, checkAccountPayload, checkAccountNameUnique } = require('./accounts-middleware');
 
 router.get('/', async (req, res, next) => {
   // DO YOUR MAGIC
@@ -9,7 +9,7 @@ router.get('/', async (req, res, next) => {
       res.status(200).json(accounts);
     })
     .catch(err => {
-      res.status(500).json({ message: `Error: ${err}` });
+      next(err);
     })
 })
 
@@ -18,25 +18,25 @@ router.get('/:id', checkAccountId, (req, res, next) => {
   res.status(200).json(req.account);
 });
 
-router.post('/', checkAccountPayload, (req, res, next) => {
+router.post('/', checkAccountPayload, checkAccountNameUnique, (req, res, next) => {
   // DO YOUR MAGIC
   create(req.body)
     .then(newAccount => {
-      res.status(200).json(newAccount);
+      res.status(201).json(newAccount);
     })
     .catch(err => {
-      res.status(500).json({ message: `Error: ${err}` });
+      next(err);
     })
 });
 
-router.put('/:id', checkAccountId, checkAccountPayload, (req, res, next) => {
+router.put('/:id', checkAccountId, checkAccountPayload, checkAccountNameUnique, (req, res, next) => {
   // DO YOUR MAGIC
   updateById(req.params.id, req.body)
     .then(updates => {
       res.status(200).json(updates);
     })
     .catch(err => {
-      res.status(500).json({ message: `Error: ${err}` });
+      next(err);
     })
 });
 
@@ -47,7 +47,7 @@ router.delete('/:id', checkAccountId, (req, res, next) => {
       res.status(200).json(deleted);
     })
     .catch(err => {
-      res.status(500).json({ message: `Error: ${err}` });
+      next(err);
     })
 })
 

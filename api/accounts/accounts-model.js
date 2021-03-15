@@ -7,18 +7,20 @@ const getAll = () => {
 
 const getById = id => {
   // DO YOUR MAGIC
-  return db('accounts').where('id', id);
+  return db('accounts').where('id', id).select('name', 'budget').first();
 }
 
 const create = async account => {
   // DO YOUR MAGIC
-  const newAccount = await db('accounts').insert(account);
+  const trimmed = {...account, name: account.name.trim()};
+  const newAccount = await db('accounts').insert(trimmed);
   return await getById(newAccount);
 }
 
 const updateById = async (id, account) => {
   // DO YOUR MAGIC
-  await db('accounts').where('id', id).update(account);
+  const trimmed = {...account, name: account.name.trim()};
+  await db('accounts').where('id', id).update(trimmed);
   return getById(id);
 }
 

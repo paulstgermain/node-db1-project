@@ -22,10 +22,10 @@ exports.checkAccountPayload = (req, res, next) => {
 
 exports.checkAccountNameUnique = async (req, res, next) => {
   // DO YOUR MAGIC
-  const checked = await db('accounts').where('name', req.body.name);
+  const checked = await db('accounts').where('name', req.body.name.trim());
 
   if (checked.length != 0) {
-    res.status(400).json({ message: "account not found" });
+    res.status(400).json({ message: "that name is taken" });
   } else {
     next();
   }
@@ -35,7 +35,7 @@ exports.checkAccountId = async (req, res, next) => {
   // DO YOUR MAGIC
   const result = await getById(req.params.id);
 
-  if (result.length === 0) {
+  if (!result) {
     res.status(404).json({ message: "account not found" })
   } else {
     req.account = result;
